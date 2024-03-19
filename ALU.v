@@ -17,7 +17,7 @@ assign invalid = 32'bx;
 wire [1:0] select;
 
 
-mux4 m4(
+mux8 m4(
     .out32(out32),
     .in1(and_out),
     .in2(or_out),
