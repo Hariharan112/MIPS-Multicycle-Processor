@@ -19,7 +19,7 @@ module ALU_tb ();
         ALUop = 3'b000;
         #10  ALUop = 3'b001;
         #10  ALUop = 3'b010;
-        #10  ALUop = 3'b011;
+        #10  ALUop = 3'b110;
         #10;
         $finish;
     end
