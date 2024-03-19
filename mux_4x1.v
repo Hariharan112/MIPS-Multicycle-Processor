@@ -1,5 +1,5 @@
 //verilog module for 4x1_MUX
-module mux_2x1(
+module mux_4x1(
     in_0,
     in_1,
     in_2,
