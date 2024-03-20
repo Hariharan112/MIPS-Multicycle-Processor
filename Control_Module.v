@@ -15,7 +15,10 @@ module  control (
     parameter S8 = 4'b1000; //Branch completion
     parameter S9 = 4'b1001; //Jump completion
 
+    //define the current state and the next state
+    reg [3:0] state, nextState;
 
+    state = S0;
 
     //define the state transition logic
     always @(posedge clk) begin
@@ -24,6 +27,8 @@ module  control (
 
     //define the next state logic
 
+    //OPCODE: 000000 = R-type, 000100 = beq, 100011 = lw, 101011 = sw , 000010 = j
+
     always @(*) begin
         case (state)
             S0: begin
@@ -31,23 +36,23 @@ module  control (
                 PCWriteCond = 0;
                 PCWrite = 1;
                 IorD = 0;
-                MemRead = 0;
+                MemRead = 1;
                 MemWrite = 0;
                 MemtoReg = 0;
                 IRWrite = 1;
                 RegDst = 0;
                 RegWrite = 0;
                 ALUSrcA = 0;
-                ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUSrcB = 2'b01;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
             S1: begin
 
-                if (opcode == 6'b000000 | opcode == 6'b000000) begin
+                if (opcode == 6'b100011 | opcode == 6'b101011) begin
                     nextState = S2;
                 end
-                else if (opcode == 6'b000010) begin
+                else if (opcode == 6'b000000) begin
                     nextState = S6;
                 end
                 else if (opcode == 6'b000100) begin
@@ -67,12 +72,12 @@ module  control (
                 RegDst = 0;
                 RegWrite = 0;
                 ALUSrcA = 0;
-                ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUSrcB = 2'b11;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
             S2: begin
-                if (opcode == 6'b000000) begin
+                if (opcode == 6'b100011) begin
                     nextState = S3;
                 end
                 else begin
@@ -80,7 +85,7 @@ module  control (
                 end
                 PCWriteCond = 0;
                 PCWrite = 0;
-                IorD = 1;
+                IorD = 0;
                 MemRead = 0;
                 MemWrite = 0;
                 MemtoReg = 0;
@@ -89,14 +94,14 @@ module  control (
                 RegWrite = 0;
                 ALUSrcA = 1;
                 ALUSrcB = 2'b10;
-                ALUOp = 3'b000;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
             S3: begin
                 nextState = S4;
                 PCWriteCond = 0;
                 PCWrite = 0;
-                IorD = 0;
+                IorD = 1;
                 MemRead = 1;
                 MemWrite = 0;
                 MemtoReg = 1;
@@ -105,7 +110,7 @@ module  control (
                 RegWrite = 0;
                 ALUSrcA = 0;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
             S4: begin
@@ -113,15 +118,15 @@ module  control (
                 PCWriteCond = 0;
                 PCWrite = 0;
                 IorD = 0;
-                MemRead = 1;
+                MemRead = 0;
                 MemWrite = 0;
                 MemtoReg = 1;
                 IRWrite = 0;
                 RegDst = 0;
-                RegWrite = 0;
+                RegWrite = 1;
                 ALUSrcA = 0;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
 
@@ -129,7 +134,7 @@ module  control (
                 nextState = S0;
                 PCWriteCond = 0;
                 PCWrite = 0;
-                IorD = 0;
+                IorD = 1;
                 MemRead = 0;
                 MemWrite = 1;
                 MemtoReg = 0;
@@ -138,7 +143,7 @@ module  control (
                 RegWrite = 0;
                 ALUSrcA = 0;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
 
@@ -151,11 +156,11 @@ module  control (
                 MemWrite = 0;
                 MemtoReg = 0;
                 IRWrite = 0;
-                RegDst = 1;
-                RegWrite = 1;
-                ALUSrcA = 0;
+                RegDst = 0;
+                RegWrite = 0;
+                ALUSrcA = 1;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b010;
+                ALUOp = 2'b10;
                 PCSource = 2'b00;
             end
 
@@ -168,17 +173,17 @@ module  control (
                 MemWrite = 0;
                 MemtoReg = 0;
                 IRWrite = 0;
-                RegDst = 0;
-                RegWrite = 0;
+                RegDst = 1;
+                RegWrite = 1;
                 ALUSrcA = 0;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUOp = 2'b00;
                 PCSource = 2'b00;
             end
 
             S8: begin
                 nextState = S0;
-                PCWriteCond = 0;
+                PCWriteCond = 1;
                 PCWrite = 0;
                 IorD = 0;
                 MemRead = 0;
@@ -187,16 +192,16 @@ module  control (
                 IRWrite = 0;
                 RegDst = 0;
                 RegWrite = 0;
-                ALUSrcA = 0;
+                ALUSrcA = 1;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUOp = 2'b01;
                 PCSource = 2'b01;
             end
 
             S9: begin
                 nextState = S0;
                 PCWriteCond = 0;
-                PCWrite = 0;
+                PCWrite = 1;
                 IorD = 0;
                 MemRead = 0;
                 MemWrite = 0;
@@ -206,7 +211,7 @@ module  control (
                 RegWrite = 0;
                 ALUSrcA = 0;
                 ALUSrcB = 2'b00;
-                ALUOp = 3'b000;
+                ALUOp = 2'b00;
                 PCSource = 2'b10;
             end
 
