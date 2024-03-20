@@ -4,27 +4,36 @@ module memory (
     output reg [31:0] out32, input [5:0] address , input [31:0] writeData ,input memwrite ,  memread ,clk
     );
 
-    reg [31:0] mem [49:0];
+    reg [7:0] mem [50:0];
 
     //intialize first 3 memory locations with add instruction using reg file address 1,2,3 ; 4,5,6 ; 7,8,9 in hex with add having 6 opcode 000000 and rs rt rd as next 3 5 bit addresses and 00000 as shamt and 100000 as funct
     // in hex
 
 
     initial begin
-        mem[0] = 32'h00430822;
+        mem[0] = 8'h00;
+        mem[1] = 8'h43;
+        mem[2] = 8'h08;
+        mem[3] = 8'h22;
     end
 
 
 
     always @(posedge clk ) begin
         if (memwrite) begin
-            mem[address] <= writeData;
+            mem[address] <= writeData[31:24];
+            mem[address+1] <= writeData[23:16];
+            mem[address+2] <= writeData[15:8];
+            mem[address+3] <= writeData[7:0];
         end
     end
 
      always @(* )  begin
         if (memread) begin
-            out32 <= mem[address];
+            out32[31:24] <= mem[address];
+            out32[23:16] <= mem[address+1];
+            out32[15:8] <= mem[address+2];
+            out32[7:0] <= mem[address+3];
         end
     end
 
