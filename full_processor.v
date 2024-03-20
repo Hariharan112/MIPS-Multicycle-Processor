@@ -8,6 +8,7 @@ module riscp  (
 
     initial begin
         PC = 32'h00000000;
+
     end
 
     //Control Signals
@@ -79,6 +80,7 @@ module riscp  (
 
     ALU alu(
         .out32(ALU_result),
+        .zero(zero),
         .A32(finalA),
         .B32(finalB),
         .ALUop(alucontrol)
@@ -119,14 +121,14 @@ module riscp  (
     );
 
     mux_2x1 muxA(
-        .in_0(ReadDataA),
-        .in_1(PC),
+        .in_0(PC),
+        .in_1(A),
         .sel(ALUSrcA),
         .Out(finalA)
     );
 
     mux_4x1 muxB(
-        .in_0(ReadDataB),
+        .in_0(B),
         .in_1(4),
         .in_2(extended),
         .in_3(shifted),
@@ -150,14 +152,20 @@ module riscp  (
 
     mux_2x1 muxmemaddress(
         .in_0(PC),
-        .in_1(ALUout),
+        .in_1(ALU_result),
         .sel(IorD),
         .Out(final_address)
     );
 
     always @ (posedge clk) begin
+        #1;
+        MDR <= memreadData;
+        ALUout <= ALU_result;
+        A <= ReadDataA;
+        B <= ReadDataB;
+
         if (IRWrite) begin
-            IR = memreadData;
+            IR <= memreadData;
         end
         if (PCWriteCond) begin
             if (zero) begin
@@ -166,15 +174,9 @@ module riscp  (
         end
         else if (PCWrite) begin
             PC <= nextPC;
-        end
+        end 
+              
 
-
-        
-        MDR <= memreadData;
-        A <= finalA;
-        B <= finalB;
-
-        ALUout <= ALU_result;
     end
 
 

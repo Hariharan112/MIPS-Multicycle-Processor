@@ -11,7 +11,7 @@ module memory (
 
 
     initial begin
-        mem[0] = 32'h00A11820;
+        mem[0] = 32'h00A11822;
     end
 
 
@@ -22,7 +22,7 @@ module memory (
         end
     end
 
-    always @(posedge clk) begin
+     always @(* )  begin
         if (memread) begin
             out32 <= mem[address];
         end
