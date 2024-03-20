@@ -1,8 +1,16 @@
+`timescale 1ns / 1ps
 module RegFile (
-    output [31:0] regA,regB , input [4:0] readRegA, readRegB, writeReg, input [31:0] writeData, input RegWrite , input RegRead , input clk
+    output reg [31:0] regA,regB , input [4:0] readRegA, readRegB, writeReg, input [31:0] writeData, input RegWrite , input clk
     );
 
     reg [31:0] regFile [31:0];
+
+    //intialize the register file
+    initial begin
+        regFile[1] = 32'h00000001;
+        regFile[3] = 32'h00000000;
+        regFile[5] = 32'h00000010;
+    end
 
     always @(posedge clk) begin
         if (RegWrite) begin
@@ -11,10 +19,8 @@ module RegFile (
     end
 
     always @(negedge clk) begin
-        if (RegRead) begin
             regA <= regFile[readRegA];
             regB <= regFile[readRegB];
-        end
     end
     
 endmodule

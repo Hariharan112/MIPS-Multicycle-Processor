@@ -1,14 +1,24 @@
-
+`timescale 1ns / 1ps
 
 module riscp  (
     input clk
 );
 
-    reg [31:0] PC = 32'b0 , IR,  MDR , A, B, ALUout;
+    reg [31:0] PC , IR,  MDR , A, B, ALUout;
+
+    initial begin
+        PC = 32'h00000000;
+    end
 
     //Control Signals
-    wire PCWriteCond, PCWrite, IorD, MemRead, MemWrite, MemtoReg, IRWrite, RegDst,RegWrite,ALUSrcA;
-    wire [1:0] ALUSrcB, ALUOp, PCSource;
+//    wire PCWriteCond =0, PCWrite =1, IorD =0 , MemRead =1 , MemWrite = 0, MemtoReg =0 , IRWrite =1 , RegDst = 0 ,RegWrite = 0,ALUSrcA=0;
+//    wire [1:0] ALUSrcB = 2'b01, ALUOp = 2'b00, PCSource = 2'b00;
+
+    wire PCWriteCond , PCWrite , IorD  , MemRead  , MemWrite , MemtoReg  , IRWrite  , RegDst ,RegWrite,ALUSrcA;
+    wire [1:0] ALUSrcB , ALUOp , PCSource ;
+
+
+
 
     control controlBlock(
         .opcode(IR[31:26]),
@@ -24,7 +34,8 @@ module riscp  (
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
         .IRWrite(IRWrite),
-        .RegWrite(RegWrite)
+        .RegWrite(RegWrite),
+        .clk(clk)
     );
 
     wire [2:0] alucontrol;
@@ -41,14 +52,13 @@ module riscp  (
 
     RegFile regFile(
         .clk(clk),
-        .RegDst(RegDst),
         .RegWrite(RegWrite),
-        .ReadReg1(IR[25:21]),
-        .ReadReg2(IR[20:16]),
-        .WriteReg(WriteReg),
-        .WriteData(regwriteData),
-        .ReadData1(ReadDataA),
-        .ReadData2(ReadDataB)
+        .readRegB(IR[20:16]),
+        .readRegA(IR[25:21]),
+        .writeReg(WriteReg),
+        .writeData(regwriteData),
+        .regA(ReadDataA),
+        .regB(ReadDataB)
     );
 
     wire [31:0] final_address;
@@ -60,7 +70,7 @@ module riscp  (
         .writeData(writeData),
         .memwrite(B),
         .memread(MemRead),
-        .readData(memreadData)
+        .out32(memreadData)
     );
 
     wire [31:0] finalA, finalB;
@@ -71,21 +81,21 @@ module riscp  (
         .out32(ALU_result),
         .A32(finalA),
         .B32(finalB),
-        .ALUop(ALU_control)
+        .ALUop(alucontrol)
     );
 
     wire [31:0] extended;
 
     sign_extend signExtend(
-        .in16(IR[15:0]),
-        .out32(extended)
+        .Imm(IR[15:0]),
+        .extended(extended)
     );
 
     wire [31:0 ] shifted;
 
     shifter shifter1(
-        .in32(extended),
-        .out32(shifted)
+        .in(extended),
+        .shifted(shifted)
     );
 
     wire [31:0] jump_address;
@@ -100,52 +110,55 @@ module riscp  (
     wire [31:0] invalid = 32'bx;
 
     mux_4x1 muxPC(
-        .in0(ALU_result),
-        .in1(ALUout),
-        .in2(jump_address),
-        .in3(invalid),
+        .in_0(ALU_result),
+        .in_1(ALUout),
+        .in_2(jump_address),
+        .in_3(invalid),
         .sel(PCSource),
-        .out(nextPC)
+        .Out(nextPC)
     );
 
     mux_2x1 muxA(
-        .in0(ReadDataA),
-        .in1(PC),
+        .in_0(ReadDataA),
+        .in_1(PC),
         .sel(ALUSrcA),
-        .out(finalA)
+        .Out(finalA)
     );
 
     mux_4x1 muxB(
-        .in0(ReadDataB),
-        .in1(4),
-        .in2(extended),
-        .in3(shifted),
+        .in_0(ReadDataB),
+        .in_1(4),
+        .in_2(extended),
+        .in_3(shifted),
         .sel(ALUSrcB),
-        .out(finalB)
+        .Out(finalB)
     );
 
     mux_2x1 muxwriteregno(
-        .in0(IR[20:16]),
-        .in1(IR[15:11]),
+        .in_0(IR[20:16]),
+        .in_1(IR[15:11]),
         .sel(RegDst),
-        .out(WriteReg)
+        .Out(WriteReg)
     );
 
     mux_2x1  muxregwritedata(
-        .in0(ALUout),
-        .in1(MDR),
+        .in_0(ALUout),
+        .in_1(MDR),
         .sel(MemtoReg),
-        .out(regwriteData)
+        .Out(regwriteData)
     );
 
     mux_2x1 muxmemaddress(
-        .in0(PC),
-        .in1(ALUout),
+        .in_0(PC),
+        .in_1(ALUout),
         .sel(IorD),
-        .out(final_address)
+        .Out(final_address)
     );
 
     always @ (posedge clk) begin
+        if (IRWrite) begin
+            IR = memreadData;
+        end
         if (PCWriteCond) begin
             if (zero) begin
                 PC <= nextPC;
@@ -155,9 +168,7 @@ module riscp  (
             PC <= nextPC;
         end
 
-        if (IRWrite) begin
-            IR <= memreadData;
-        end
+
         
         MDR <= memreadData;
         A <= finalA;
@@ -167,20 +178,7 @@ module riscp  (
     end
 
 
-
 endmodule
 
 
 
-//write testbench for this module
-module riscp_tb;
-    reg clk;
-    wire [31:0] PC, IR,  MDR , A, B, ALUout;
-    riscp riscp1(
-        .clk(clk)
-    );
-
-    initial begin
-        clk = 0;
-        forever #10 clk = ~clk;
-    end
