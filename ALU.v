@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ALU(output [31:0] out32,input [31:0] A32,B32, input [2:0] ALUop
+module ALU(output [31:0] out32,output zero,input [31:0] A32,B32, input [2:0] ALUop
 );
 
 wire [31:0] and_out, or_out, add_out, sub_out,slt_out,invalid;
@@ -28,5 +28,7 @@ mux8 m8(
     .in7(sub_out),
     .in8(slt_out),
     .sel(ALUop));
+
+assign zero = (out32 == 32'b0) ? 1'b1 : 1'b0;
     
 endmodule

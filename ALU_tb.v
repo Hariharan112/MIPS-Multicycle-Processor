@@ -5,9 +5,11 @@ module ALU_tb ();
     reg [31:0] A32, B32;
     reg [3:0] ALUop;
     wire [31:0] out32;
+    wire zero;
     
     ALU ALU1(
         .out32(out32),
+        .zero(zero),
         .A32(A32),
         .B32(B32),
         .ALUop(ALUop)
