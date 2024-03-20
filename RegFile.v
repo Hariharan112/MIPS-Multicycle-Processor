@@ -7,9 +7,9 @@ module RegFile (
 
     //intialize the register file
     initial begin
-        regFile[1] = 32'h00000001;
-        regFile[3] = 32'h00000000;
-        regFile[5] = 32'h00000010;
+        regFile[1] = 32'h0;
+        regFile[2] = 25;
+        regFile[3] = 40;
     end
 
     always @(posedge clk) begin

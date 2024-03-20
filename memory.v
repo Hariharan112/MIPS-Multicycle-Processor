@@ -11,7 +11,7 @@ module memory (
 
 
     initial begin
-        mem[0] = 32'h00A11822;
+        mem[0] = 32'h00430822;
     end
 
 
