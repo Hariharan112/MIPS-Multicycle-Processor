@@ -215,5 +215,8 @@ module  control (
                 PCSource = 2'b10;
             end
 
-    
+        endcase
+
+    end
+
 endmodule
