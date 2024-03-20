@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module mux4 (
+module mux8 (
     output [31:0] out32, input [31:0] in1, in2, in3, in4,in5,in6,in7,in8, input [2:0] sel
     );
 

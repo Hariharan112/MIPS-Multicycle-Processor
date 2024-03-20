@@ -1,12 +1,11 @@
-endmodule
+`timescale 1ns / 1ps
 
-module control_tb()
-
-//test the module for the different states
+module control_tb();
 
     reg clk;
     reg [5:0] opcode;
-    wire PCWriteCond, PCWrite, IorD, MemRead, MemWrite, MemtoReg, IRWrite, RegDst,RegWrite,ALUSrcA, ALUSrcB,ALUOp,PCSource;
+    wire PCWriteCond, PCWrite, IorD, MemRead, MemWrite, MemtoReg, IRWrite, RegDst,RegWrite,ALUSrcA;
+    wire [1:0]  ALUSrcB,ALUOp,PCSource;
 
     control control1(
         .PCWriteCond(PCWriteCond), 
@@ -27,7 +26,7 @@ module control_tb()
     );
 
     initial begin
-        clk = 0;
+        
         opcode = 6'b000000;
         #40;
         opcode = 6'b100011;
@@ -36,16 +35,16 @@ module control_tb()
         #30;
         opcode = 6'b000010;
         #30;
-        opcode = 6'b101011
+        opcode = 6'b101011;
         #40;
         $finish;
+       end
 
-
-
-    end
-
-    always begin
-         clk = ~clk #5;
-    end
+    initial begin
+        
+        clk = 0;
+        #5;
+        forever #5 clk = ~clk;
+        end
 
 endmodule

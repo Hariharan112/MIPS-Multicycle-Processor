@@ -1,4 +1,6 @@
-module  control (
+`timescale 1ns / 1ps
+
+module  control(
     output reg PCWriteCond, PCWrite, IorD, MemRead, MemWrite, MemtoReg, IRWrite, RegDst,RegWrite,ALUSrcA, output reg [1:0] ALUSrcB,ALUOp,PCSource, input [5:0] opcode , input clk
     );
 
@@ -18,7 +20,10 @@ module  control (
     //define the current state and the next state
     reg [3:0] state, nextState;
 
-    state = S0;
+    //initialize the state
+    initial begin
+        state = S0;
+    end
 
     //define the state transition logic
     always @(posedge clk) begin
@@ -81,7 +86,7 @@ module  control (
                     nextState = S3;
                 end
                 else begin
-                    nextState = S4;
+                    nextState = S5;
                 end
                 PCWriteCond = 0;
                 PCWrite = 0;
@@ -104,7 +109,7 @@ module  control (
                 IorD = 1;
                 MemRead = 1;
                 MemWrite = 0;
-                MemtoReg = 1;
+                MemtoReg = 0;
                 IRWrite = 0;
                 RegDst = 0;
                 RegWrite = 0;
@@ -213,7 +218,12 @@ module  control (
                 ALUSrcB = 2'b00;
                 ALUOp = 2'b00;
                 PCSource = 2'b10;
-            end
+                
+             end
+                
+             default: begin
+             nextState=S0;
+             end
 
         endcase
 
