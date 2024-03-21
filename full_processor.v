@@ -152,7 +152,7 @@ module riscp  (
 
     mux_2x1 muxmemaddress(
         .in_0(PC),
-        .in_1(ALU_result),
+        .in_1(ALUout),
         .sel(IorD),
         .Out(final_address)
     );

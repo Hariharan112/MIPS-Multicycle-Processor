@@ -15,6 +15,17 @@ module memory (
         mem[1] = 8'h43;
         mem[2] = 8'h08;
         mem[3] = 8'h22;
+
+        mem[4] = 8'h8C;
+        mem[5] = 8'hA4;
+        mem[6] = 8'h00;
+        mem[7] = 8'h06;
+        
+        mem[24] = 8'h11;
+        mem[25] = 8'h11;
+        mem[26] = 8'h11;
+        mem[27] = 8'h11;
+        
     end
 
 
