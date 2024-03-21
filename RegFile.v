@@ -10,7 +10,7 @@ module RegFile (
         regFile[1] = 32'h0;
         regFile[2] = 25;
         regFile[3] = 40;
-        regFile[5] = 18;
+        regFile[5] = 32'h1A3BEE22;
     end
 
     always @(posedge clk) begin
