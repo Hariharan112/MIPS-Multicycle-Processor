@@ -11,7 +11,7 @@ module riscp_tb;
         forever #10 clk = ~clk;
     end
     initial begin
-    #80;
+    #200;
     $finish;
     end
 endmodule
